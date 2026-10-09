@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exactor Sudoku Arena — Neuro-Symbolic SAT vs Pure JEV (LLM)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-wrapper">
+        <!-- TOP HEADER -->
+        <header class="top-nav">
+            <div class="nav-brand">
+                <div class="logo-icon">
+                    <span class="symbolic-glyph">🔢</span>
+                    <span class="sparkle">✦</span>
+                </div>
+                <div class="brand-text">
+                    <h1>EXACTOR <span class="accent-text">SUDOKU ARENA</span></h1>
+                    <span class="subtitle">Neuro-Symbolic Constraint Propagation vs Pure JEV LLM</span>
+                </div>
+            </div>
+
+            <div class="nav-badges">
+                <span class="badge badge-cyan"><span class="dot"></span> Sub-ms SAT Fast Path</span>
+                <span class="badge badge-purple"><span class="dot"></span> 0 Duplicate Violations</span>
+                <span class="badge badge-green"><span class="dot"></span> MRV Entropy Branching</span>
+            </div>
+
+            <div class="nav-actions">
+                <button id="soundToggleBtn" class="btn btn-icon" title="Toggle Sound">🔊</button>
+                <a href="https://github.com" target="_blank" class="btn btn-outline">GitHub</a>
+            </div>
+        </header>
+
+        <!-- NAVIGATION TABS -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="arenaTab">🎮 Interactive Sudoku Arena</button>
+            <button class="tab-btn" data-tab="duelTab">⚔️ Live Dual Race (Side-by-Side)</button>
+            <button class="tab-btn" data-tab="benchmarkTab">📊 Benchmark Suite</button>
+            <button class="tab-btn" data-tab="proofsTab">🔬 SAT Proof Inspector</button>
+        </div>
+
+        <main class="content-body">
+            
+            <!-- TAB 1: ARENA -->
+            <section id="arenaTab" class="tab-pane active">
+                <div class="arena-layout">
+                    <!-- CONTROLS SIDEBAR -->
+                    <div class="panel control-panel">
+                        <div class="panel-header">
+                            <h3>⚙️ Match Controls</h3>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="difficultySelect">Difficulty Preset</label>
+                            <select id="difficultySelect" class="form-select">
+                                <option value="easy">Easy (Classic Warmup)</option>
+                                <option value="medium" selected>Medium (Standard Single Reduction)</option>
+                                <option value="hard">Hard (Multi-Unit Interlocking)</option>
+                                <option value="evil">Evil / Master (MRV Bifurcation Required)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="agentSelect">AI Solver Engine</label>
+                            <select id="agentSelect" class="form-select">
+                                <option value="exactor" selected>⚡ Exactor-Accelerator (Fast-Path SAT)</option>
+                                <option value="jev">🧠 Pure JEV (LLM / RLCD Inference)</option>
+                                <option value="backtrack">🧩 Classical Backtracking (DFS)</option>
+                            </select>
+                        </div>
+
+                        <div class="action-buttons-grid">
+                            <button id="newPuzzleBtn" class="btn btn-primary">🔄 New Puzzle</button>
+                            <button id="aiStepBtn" class="btn btn-accent">⚡ AI Deduction Step</button>
+                            <button id="aiAutoBtn" class="btn btn-success">▶ Auto Solve</button>
+                            <button id="resetPuzzleBtn" class="btn btn-secondary">↺ Reset</button>
+                        </div>
+
+                        <div class="control-group slider-group">
+                            <div class="slider-header">
+                                <label for="speedSlider">Auto-Solve Speed</label>
+                                <span id="speedValueText" class="mono-badge">60 ms</span>
+                            </div>
+                            <input type="range" id="speedSlider" min="10" max="600" value="60" step="10">
+                        </div>
+
+                        <!-- LIVE TELEMETRY -->
+                        <div class="telemetry-card">
+                            <h4>📡 Live Telemetry</h4>
+                            <div class="stat-row">
+                                <span>Last Deduction Latency:</span>
+                                <span id="lastLatencyText" class="stat-highlight">0.00 ms</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Remaining Empty Cells:</span>
+                                <span id="emptyCellsCountText" class="stat-highlight">45 cells</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Duplicate Violations:</span>
+                                <span id="violationsText" class="stat-green">0 errors</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>API Calls Saved:</span>
+                                <span id="apiSavedText" class="stat-green">0 calls</span>
+                            </div>
+                        </div>
+
+                        <!-- NUMBER PAD FOR MANUAL PLAY -->
+                        <div class="numpad-container">
+                            <div class="numpad-title">Digit Selector:</div>
+                            <div class="numpad-grid">
+                                <button class="num-btn" data-num="1">1</button>
+                                <button class="num-btn" data-num="2">2</button>
+                                <button class="num-btn" data-num="3">3</button>
+                                <button class="num-btn" data-num="4">4</button>
+                                <button class="num-btn" data-num="5">5</button>
+                                <button class="num-btn" data-num="6">6</button>
+                                <button class="num-btn" data-num="7">7</button>
+                                <button class="num-btn" data-num="8">8</button>
+                                <button class="num-btn" data-num="9">9</button>
+                                <button class="num-btn clear-btn" data-num="0">✕</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOARD PANEL -->
+                    <div class="panel board-panel">
+                        <div class="board-scoreboard">
+                            <div class="score-card">
+                                <span class="score-label">EMPTY</span>
+                                <span id="emptyScoreText" class="digital-lcd">045</span>
+                            </div>
+                            <button id="statusFaceBtn" class="face-btn" title="Reset puzzle">🧠</button>
+                            <div class="score-card">
+                                <span class="score-label">TIME</span>
+                                <span id="timerText" class="digital-lcd">000</span>
+                            </div>
+                        </div>
+
+                        <div class="sudoku-board-wrapper">
+                            <div id="sudokuGrid" class="sudoku-grid"></div>
+                        </div>
+
+                        <!-- EXPLANATION BANNER -->
+                        <div class="explanation-box">
+                            <div class="exp-icon">💡</div>
+                            <div class="exp-content">
+                                <div class="exp-title">Algebraic Causal Proof:</div>
+                                <div id="explanationText" class="exp-body">Click an empty cell or press "AI Deduction Step" to watch Exactor resolve Naked/Hidden Singles in microseconds.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: LIVE DUAL RACE -->
+            <section id="duelTab" class="tab-pane">
+                <div class="duel-header-banner">
+                    <div class="duel-title-box">
+                        <h2>⚔️ Real-Time Split Duel: Exactor vs Pure JEV (Sudoku)</h2>
+                        <p>Both solvers race to solve the exact same puzzle simultaneously. Observe constraint propagation latency, API calls, and spatial drift errors!</p>
+                    </div>
+                    <div class="duel-actions">
+                        <button id="startDuelBtn" class="btn btn-primary btn-lg">🚀 Launch Live Race</button>
+                        <button id="pauseDuelBtn" class="btn btn-secondary btn-lg" disabled>⏸ Pause</button>
+                        <button id="resetDuelBtn" class="btn btn-outline btn-lg">🔄 New Puzzle</button>
+                    </div>
+                </div>
+
+                <div class="duel-boards-grid">
+                    <!-- EXACTOR -->
+                    <div class="duel-card exactor-card">
+                        <div class="duel-card-header">
+                            <div class="agent-title">
+                                <span class="dot pulse-cyan"></span>
+                                <h3>Exactor-Accelerator (Neuro-Symbolic SAT)</h3>
+                            </div>
+                            <span class="badge badge-cyan" id="exactorDuelStatus">READY</span>
+                        </div>
+                        <div class="duel-stats-bar">
+                            <div>Latency: <strong id="exactorAvgLat">0.03 ms</strong></div>
+                            <div>Speedup: <strong class="text-green" id="exactorSpeedup">---</strong></div>
+                            <div>Violations: <strong class="text-green" id="exactorViolations">0</strong></div>
+                            <div>API Calls: <strong class="text-green" id="exactorApiCalls">0</strong></div>
+                        </div>
+                        <div class="duel-grid-container">
+                            <div id="duelGridExactor" class="sudoku-grid mini-sudoku"></div>
+                        </div>
+                        <div class="duel-log-box" id="exactorDuelLog">Awaiting race start...</div>
+                    </div>
+
+                    <!-- PURE JEV -->
+                    <div class="duel-card jev-card">
+                        <div class="duel-card-header">
+                            <div class="agent-title">
+                                <span class="dot pulse-purple"></span>
+                                <h3>Pure JEV (LLM / RLCD Inference)</h3>
+                            </div>
+                            <span class="badge badge-purple" id="jevDuelStatus">READY</span>
+                        </div>
+                        <div class="duel-stats-bar">
+                            <div>Latency: <strong id="jevAvgLat">420.0 ms</strong></div>
+                            <div>Speedup: <strong>1.0x (Baseline)</strong></div>
+                            <div>Violations: <strong class="text-amber" id="jevViolations">0</strong></div>
+                            <div>API Calls: <strong class="text-amber" id="jevApiCalls">0</strong></div>
+                        </div>
+                        <div class="duel-grid-container">
+                            <div id="duelGridJev" class="sudoku-grid mini-sudoku"></div>
+                        </div>
+                        <div class="duel-log-box" id="jevDuelLog">Awaiting race start...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: BENCHMARK SUITE -->
+            <section id="benchmarkTab" class="tab-pane">
+                <div class="benchmark-container">
+                    <div class="bench-control-bar panel">
+                        <div class="bench-options">
+                            <div class="control-group inline">
+                                <label for="benchPuzzleCount">Sample Puzzles (N):</label>
+                                <select id="benchPuzzleCount" class="form-select">
+                                    <option value="10">10 Puzzles</option>
+                                    <option value="25" selected>25 Puzzles</option>
+                                    <option value="50">50 Puzzles</option>
+                                </select>
+                            </div>
+                            <div class="control-group inline">
+                                <label for="benchDifficulty">Difficulty:</label>
+                                <select id="benchDifficulty" class="form-select">
+                                    <option value="easy">Easy</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="hard">Hard</option>
+                                    <option value="evil">Evil / Master</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="runBenchmarkBtn" class="btn btn-primary btn-lg">📊 Run Automated Monte Carlo Benchmark</button>
+                    </div>
+
+                    <!-- RESULTS TABLE -->
+                    <div class="panel benchmark-results-panel">
+                        <div class="panel-header">
+                            <h3>🏆 Empirical Comparison Matrix</h3>
+                            <button id="exportReportBtn" class="btn btn-outline btn-sm">📥 Export Markdown</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="benchmark-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric / Dimension</th>
+                                        <th>Pure JEV (Solo LLM)</th>
+                                        <th>Exactor-Accelerator</th>
+                                        <th>Classical Backtracking</th>
+                                        <th>Neuro-Symbolic Delta</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="benchmarkTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Click "Run Automated Monte Carlo Benchmark" to evaluate algorithms.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS GRID -->
+                    <div class="charts-grid">
+                        <div class="panel chart-card">
+                            <h4>⚡ Deduction Latency (ms per placed number)</h4>
+                            <div class="canvas-box">
+                                <canvas id="latencyChartCanvas"></canvas>
+                            </div>
+                        </div>
+                        <div class="panel chart-card">
+                            <h4>🎯 Solve Rate & Constraint Precision (%)</h4>
+                            <div class="canvas-box">
+                                <canvas id="accuracyChartCanvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: SAT PROOFS -->
+            <section id="proofsTab" class="tab-pane">
+                <div class="inspector-layout panel">
+                    <div class="panel-header">
+                        <h3>🔬 Exact Boolean SAT Logic & Spatial Propagation</h3>
+                    </div>
+                    <div class="proof-card">
+                        <h4>1. Naked Singles Deduction ($\mathcal{O}(1)$ Fast-Path)</h4>
+                        <p>For any cell $(r, c)$, let $\mathcal{C}(r, c) = \{1..9\} \setminus (\text{Row}(r) \cup \text{Col}(c) \cup \text{Box}(b))$. If $|\mathcal{C}(r, c)| = 1 \implies$ direct placement.</p>
+                    </div>
+                    <div class="proof-card">
+                        <h4>2. Hidden Singles Across 27 Interlocking Units</h4>
+                        <p>If digit $d$ appears as a candidate in exactly one cell within a unit $U \in \{\text{Rows}, \text{Cols}, \text{Boxes}\}$, then that cell must take $d$.</p>
+                    </div>
+                    <div class="proof-card">
+                        <h4>3. Minimum Remaining Values (MRV) Entropy Bifurcation</h4>
+                        <p>When all first-order Singles are exhausted on Evil boards, Exactor selects the cell with minimum candidate entropy $|\mathcal{C}(r, c)| = 2$ and explores globally consistent branches in microseconds.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
