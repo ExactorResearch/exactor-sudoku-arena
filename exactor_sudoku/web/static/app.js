@@ -830,7 +830,7 @@ function renderRuleLedger() {
     if (!ruleLedgerList) return;
 
     if (state.ruleHistory.length === 0) {
-        ruleLedgerList.innerHTML = `<div class="ledger-empty-state">No se han ejecutado deducciones aún. Presiona "⚡ AI Deduction Step" o "▶ Auto Solve".</div>`;
+        ruleLedgerList.innerHTML = `<div class="ledger-empty-state">No AI deductions executed yet. Press "⚡ AI Deduction Step" or "▶ Auto Solve".</div>`;
         return;
     }
 
@@ -867,7 +867,7 @@ function renderRuleLedger() {
             </div>
             <div class="rule-item-text" title="${item.explanation}">${item.explanation}</div>
             <div class="rule-item-actions">
-                <button class="btn btn-outline btn-sm inspect-btn" data-row="${item.row}" data-col="${item.col}">🔍 ¿Por qué?</button>
+                <button class="btn btn-outline btn-sm inspect-btn" data-row="${item.row}" data-col="${item.col}">🔍 Why?</button>
             </div>
         `;
 
@@ -897,36 +897,36 @@ async function openDecisionInspector(r, c) {
         const data = await res.json();
         if (data.status !== 'OK') return;
 
-        modalCellTitle.textContent = `Inspección de Decisión: Celda (${data.row}, ${data.col})`;
+        modalCellTitle.textContent = `Decision Breakdown: Cell (${data.row}, ${data.col})`;
         modalRuleBadge.textContent = data.rule_name;
         modalPlacedValue.textContent = data.current_value !== 0 ? data.current_value : '·';
 
         if (data.is_fixed) {
-            modalDecisionHeading.textContent = 'Pista Fija Inmutable';
-            modalDecisionSummary.textContent = 'Dada como condición inicial del rompecabezas.';
+            modalDecisionHeading.textContent = 'Original Fixed Clue';
+            modalDecisionSummary.textContent = 'Provided as immutable starting condition of the puzzle.';
         } else if (data.current_value !== 0) {
-            modalDecisionHeading.textContent = `Valor forzado: ${data.current_value}`;
+            modalDecisionHeading.textContent = `Mathematically Forced Value: ${data.current_value}`;
             modalDecisionSummary.textContent = data.causal_text;
         } else {
-            modalDecisionHeading.textContent = `Celda vacía (${data.valid_candidates.length} candidatos disponibles)`;
-            modalDecisionSummary.textContent = 'Pendiente de reducción booleana determinista.';
+            modalDecisionHeading.textContent = `Empty Cell (${data.valid_candidates.length} candidate slots available)`;
+            modalDecisionSummary.textContent = 'Awaiting deterministic Boolean deduction.';
         }
 
         modalRowIdx.textContent = data.row;
         modalColIdx.textContent = data.col;
         modalBoxIdx.textContent = `(${Math.floor((data.row - 1)/3) + 1}, ${Math.floor((data.col - 1)/3) + 1})`;
 
-        modalRowDigits.textContent = data.row_digits.length > 0 ? `[${data.row_digits.join(', ')}]` : '[Vacía]';
-        modalColDigits.textContent = data.col_digits.length > 0 ? `[${data.col_digits.join(', ')}]` : '[Vacía]';
-        modalBoxDigits.textContent = data.box_digits.length > 0 ? `[${data.box_digits.join(', ')}]` : '[Vacía]';
+        modalRowDigits.textContent = data.row_digits.length > 0 ? `[${data.row_digits.join(', ')}]` : '[None yet]';
+        modalColDigits.textContent = data.col_digits.length > 0 ? `[${data.col_digits.join(', ')}]` : '[None yet]';
+        modalBoxDigits.textContent = data.box_digits.length > 0 ? `[${data.box_digits.join(', ')}]` : '[None yet]';
 
         modalEliminatedDigits.innerHTML = data.eliminated_digits.length > 0
             ? data.eliminated_digits.map(d => `<span class="digit-tag eliminated">${d}</span>`).join('')
-            : '<span class="text-muted">Ninguno</span>';
+            : '<span class="text-muted">None</span>';
 
         modalValidDigits.innerHTML = data.valid_candidates.length > 0
             ? data.valid_candidates.map(d => `<span class="digit-tag winner">${d}</span>`).join('')
-            : '<span class="text-muted">0 candidatos (conflicto)</span>';
+            : '<span class="text-muted">0 candidates (conflict)</span>';
 
         modalCausalText.textContent = data.causal_text;
 

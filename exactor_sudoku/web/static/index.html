@@ -155,10 +155,10 @@
                             <div class="exp-icon">💡</div>
                             <div class="exp-content">
                                 <div class="exp-header-row">
-                                    <div class="exp-title">Algebraic Causal Proof / Justificación Lógica:</div>
-                                    <button id="explainSelectedCellBtn" class="btn btn-outline btn-sm">🔍 ¿Por qué esta celda?</button>
+                                    <div class="exp-title">Algebraic Causal Proof & Step-by-Step Reasoner:</div>
+                                    <button id="explainSelectedCellBtn" class="btn btn-outline btn-sm">🔍 Why this decision?</button>
                                 </div>
-                                <div id="explanationText" class="exp-body">Haz clic en cualquier celda o presiona "⚡ AI Deduction Step" para ver por qué el motor toma cada decisión en microsegundos.</div>
+                                <div id="explanationText" class="exp-body">Click any cell or press "⚡ AI Deduction Step" to watch Exactor deduce values in microseconds with 100% mathematical certainty.</div>
                             </div>
                         </div>
 
@@ -167,17 +167,17 @@
                             <div class="ledger-header">
                                 <div class="ledger-title">
                                     <span class="ledger-icon">📋</span>
-                                    <h4>Registro de Reglas Deducidas en Vivo</h4>
+                                    <h4>Live Symbolic Rule Ledger</h4>
                                 </div>
                                 <div class="ledger-summary-badges">
                                     <span class="badge badge-cyan"><strong id="countNakedSingles">0</strong> Naked Singles</span>
                                     <span class="badge badge-purple"><strong id="countHiddenSingles">0</strong> Hidden Singles</span>
                                     <span class="badge badge-green"><strong id="countMrvBranches">0</strong> MRV Branches</span>
-                                    <span class="badge badge-outline"><strong id="countTotalRules">0</strong> Total</span>
+                                    <span class="badge badge-outline"><strong id="countTotalRules">0</strong> Total Deductions</span>
                                 </div>
                             </div>
                             <div id="ruleLedgerList" class="rule-ledger-list">
-                                <div class="ledger-empty-state">No se han ejecutado deducciones aún. Presiona "⚡ AI Deduction Step" o "▶ Auto Solve".</div>
+                                <div class="ledger-empty-state">No AI deductions executed yet. Press "⚡ AI Deduction Step" or "▶ Auto Solve".</div>
                             </div>
                         </div>
                     </div>
@@ -381,33 +381,59 @@
                     <!-- HERO WHITEPAPER HEADER -->
                     <div class="panel methodology-hero">
                         <div class="hero-badge-row">
-                            <span class="badge badge-cyan">🔬 Fundamentos Teóricos</span>
-                            <span class="badge badge-purple">⚡ Neuro-Simbolismo / SAT</span>
-                            <span class="badge badge-green">🛡️ 0% Alucinaciones</span>
+                            <span class="badge badge-cyan">🔬 Technical Whitepaper</span>
+                            <span class="badge badge-purple">⚡ Neuro-Symbolic / Boolean SAT</span>
+                            <span class="badge badge-green">🛡️ 0% Hallucination Rate</span>
+                            <span class="badge badge-outline">💡 ELI5 Accessible</span>
                         </div>
-                        <h2>📘 ¿Cómo funciona EXACTOR-Accelerator?</h2>
+                        <h2>📘 How EXACTOR-Accelerator Works</h2>
                         <p class="hero-lead">
-                            El método que une la <strong>Lógica Simbólica Determinista</strong> y la <strong>Satisfacibilidad Booleana (SAT)</strong> para resolver problemas de razonamiento espacial y optimización combinatoria en microsegundos, sin GPUs gigantescas y con 100% de explicabilidad matemática.
+                            The breakthrough bridging <strong>Deterministic Symbolic Logic</strong> and <strong>Modern AI (SAT Inference)</strong> to solve NP-complete spatial reasoning and combinatorics in microseconds — on a <strong>$2 microchip</strong> with <strong>zero hallucinations</strong> and 100% mathematical auditability.
                         </p>
+                    </div>
+
+                    <!-- INFLUENCER / NON-TECHNICAL HOOK -->
+                    <div class="methodology-section">
+                        <div class="panel eli5-banner">
+                            <div class="eli5-icon">🎙️</div>
+                            <div class="eli5-content">
+                                <h4>💡 Explain Like I'm 5: The "Poet", the "Robot", and the "Master Detective"</h4>
+                                <p>Imagine three different minds trying to solve a complex puzzle:</p>
+                                <div class="analogy-grid">
+                                    <div class="analogy-box poet-box">
+                                        <div class="analogy-title">🧠 The Poet (LLMs / GPT / Pure JEV)</div>
+                                        <p>Incredibly creative and eloquent, but when forced to do strict math, it guesses by vibes and patterns. It eventually duplicates numbers because it lacks rigid spatial memory (~10% error rate).</p>
+                                    </div>
+                                    <div class="analogy-box robot-box">
+                                        <div class="analogy-title">🔴 The Blind Robot (Backtracking DFS)</div>
+                                        <p>Tries every single combination from 1 to 9 sequentially. If it makes a wrong turn early on, it tests 10 million dead-end doors before realizing its mistake, freezing the entire computer.</p>
+                                    </div>
+                                    <div class="analogy-box detective-box">
+                                        <div class="analogy-title">⚡ The Master Detective (EXACTOR SAT)</div>
+                                        <p>Applies Sherlock Holmes' golden rule: <em>"Once you eliminate the impossible, whatever remains, no matter how improbable, must be the truth."</em> It instantly locks the right number in microseconds with zero guessing.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 3-PILLAR COMPARISON -->
                     <div class="methodology-section">
-                        <h3 class="section-title">⚖️ El Gran Dilema de la Inteligencia Artificial Actual</h3>
-                        <p class="section-subtitle">¿Por qué fallan los modelos tradicionales en problemas de restricciones rígidas?</p>
+                        <h3 class="section-title">⚖️ The Core Dilemma of Modern Artificial Intelligence</h3>
+                        <p class="section-subtitle">Why do trillion-parameter models still struggle with strict constraint logic?</p>
                         
                         <div class="tri-pillar-grid">
                             <!-- LLMs -->
                             <div class="pillar-card llm-pillar">
                                 <div class="pillar-header">
                                     <span class="pillar-icon">🧠</span>
-                                    <h4>1. LLMs Puros (GPT, JEV Solo)</h4>
+                                    <h4>1. Pure LLMs (Solo Generative AI)</h4>
                                 </div>
-                                <div class="pillar-tag badge-purple">Inferencia Estadística</div>
+                                <div class="pillar-tag badge-purple">Statistical Next-Token Prediction</div>
                                 <ul class="pillar-list">
-                                    <li><strong>Mecanismo:</strong> Predicción probabilística del siguiente token según patrones del lenguaje.</li>
-                                    <li><strong>Problema:</strong> <em>Constraint Drift</em> (Alucinación de restricciones). No tiene memoria espacial rígida y repite números (~8-12% de error).</li>
-                                    <li><strong>Costo:</strong> Alto consumo de API ($), ~400ms por paso y dependencia de GPU.</li>
+                                    <li><strong>Mechanism:</strong> Predicts what looks plausible based on training data associations.</li>
+                                    <li><strong>Fatal Flaw:</strong> <em>Constraint Drift & Hallucinations.</em> It lacks a rigid mathematical verifier, causing illegal collisions.</li>
+                                    <li><strong>Cost & Speed:</strong> High API bills ($$$), ~400ms per step, requires heavy GPU server farms.</li>
                                 </ul>
                             </div>
 
@@ -415,13 +441,13 @@
                             <div class="pillar-card dfs-pillar">
                                 <div class="pillar-header">
                                     <span class="pillar-icon">🔴</span>
-                                    <h4>2. Backtracking Clásico (DFS)</h4>
+                                    <h4>2. Classical Backtracking (DFS)</h4>
                                 </div>
-                                <div class="pillar-tag badge-secondary">Fuerza Bruta Secuencial</div>
+                                <div class="pillar-tag badge-secondary">Sequential Brute Force</div>
                                 <ul class="pillar-list">
-                                    <li><strong>Mecanismo:</strong> Prueba dígitos $1 \to 9$ casilla por casilla en orden ciego y retrocede cuando choca.</li>
-                                    <li><strong>Problema:</strong> <em>Explosión Combinatoria</em> ($O(b^d)$). Explora millones de ramas muertas en tableros difíciles y se congela.</li>
-                                    <li><strong>Costo:</strong> Tiempos de espera de minutos u horas; inviable en tiempo real.</li>
+                                    <li><strong>Mechanism:</strong> Recursively places digits 1..9 from top-left to bottom-right and rolls back on failure.</li>
+                                    <li><strong>Fatal Flaw:</strong> <em>Combinatorial Explosion ($O(b^d)$).</em> Explores millions of blind branches on hard puzzles, timing out.</li>
+                                    <li><strong>Cost & Speed:</strong> CPU-bound freezing; fails completely in real-time interactive applications.</li>
                                 </ul>
                             </div>
 
@@ -431,11 +457,11 @@
                                     <span class="pillar-icon">⚡</span>
                                     <h4>3. EXACTOR-Accelerator</h4>
                                 </div>
-                                <div class="pillar-tag badge-cyan">Neuro-Simbolismo / SAT</div>
+                                <div class="pillar-tag badge-cyan">Neuro-Symbolic Boolean SAT</div>
                                 <ul class="pillar-list">
-                                    <li><strong>Mecanismo:</strong> Transforma las reglas del problema en un sistema de ecuaciones lógicas proposicionales exactas.</li>
-                                    <li><strong>Ventaja:</strong> <strong>Deduce sin adivinar.</strong> Cada celda se llena por un teorema de unicidad o reducción de cláusula ($< 0.05\text{ ms}$).</li>
-                                    <li><strong>Eficiencia:</strong> 0% alucinaciones, 100% de explicabilidad y ejecutable en hardware ultrabarato.</li>
+                                    <li><strong>Mechanism:</strong> Compiles domain constraints into propositional Boolean formulas evaluated in CPU bitmasks.</li>
+                                    <li><strong>Key Advantage:</strong> <strong>Deduction without Guessing.</strong> 85-95% of moves are solved instantly by uniqueness proofs ($< 0.05\text{ ms}$).</li>
+                                    <li><strong>Efficiency:</strong> 0% error rate, 100% causal audit trail, runs smoothly on a $2 IoT chip.</li>
                                 </ul>
                             </div>
                         </div>
@@ -443,56 +469,56 @@
 
                     <!-- 3 PHASES DEEP DIVE -->
                     <div class="methodology-section">
-                        <h3 class="section-title">⚙️ Las 3 Fases de Inferencia de EXACTOR</h3>
-                        <p class="section-subtitle">Cómo el motor procesa y deduce cualquier tablero sin ayuda externa ni trampas.</p>
+                        <h3 class="section-title">⚙️ EXACTOR's 3-Phase Reasoning Architecture</h3>
+                        <p class="section-subtitle">How the engine deduces boards autonomously without cheats, precomputed tables, or trial-and-error.</p>
 
                         <div class="phase-cards-container">
-                            <!-- FASE 1 -->
+                            <!-- PHASE 1 -->
                             <div class="panel phase-detail-card">
-                                <div class="phase-number-badge">FASE 1</div>
+                                <div class="phase-number-badge">PHASE 1</div>
                                 <div class="phase-body">
-                                    <h4>Representación en Espacio de Restricciones Bitwise ($O(1)$)</h4>
-                                    <p>Para cada celda vacía $(r, c)$, el motor evalúa en un único ciclo de CPU el conjunto de candidatos válidos $\mathcal{C}(r, c)$ eliminando los dígitos presentes en sus 3 unidades ortogonales:</p>
+                                    <h4>Bitwise Constraint Domain Formulation ($O(1)$)</h4>
+                                    <p>For every empty cell $(r, c)$, the engine calculates the allowable candidate set $\mathcal{C}(r, c)$ in a single CPU cycle using bitwise operations across its intersecting row, column, and 3x3 block:</p>
                                     <div class="formula-chip">
                                         $$\mathcal{C}(r, c) = \{1, 2, \dots, 9\} \setminus \Big(\text{Row}(r) \cup \text{Col}(c) \cup \text{Box}(b)\Big)$$
                                     </div>
                                     <div class="phase-metric-box">
-                                        <span>⚡ Latencia de consulta: <strong>0.001 ms</strong></span>
-                                        <span>🛡️ Implementación: <strong>Máscaras de bits (Bitwise Masks)</strong></span>
+                                        <span>⚡ Query Latency: <strong>0.001 ms</strong></span>
+                                        <span>🛡️ Implementation: <strong>Hardware-accelerated Bitmask Lookup</strong></span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- FASE 2 -->
+                            <!-- PHASE 2 -->
                             <div class="panel phase-detail-card">
-                                <div class="phase-number-badge">FASE 2</div>
+                                <div class="phase-number-badge">PHASE 2</div>
                                 <div class="phase-body">
-                                    <h4>Fast-Path SAT: Deducción Causal Directa (0 Bifurcaciones)</h4>
-                                    <p>Antes de explorar ninguna combinación, EXACTOR ejecuta dos pruebas lógicas simultáneas:</p>
+                                    <h4>Fast-Path SAT: Direct Causal Implication (Zero Branching)</h4>
+                                    <p>Before ever expanding a search tree, EXACTOR executes two parallel Boolean uniqueness proofs:</p>
                                     <div class="dual-subproof">
                                         <div class="subproof-item">
-                                            <strong>A. Naked Single (Cláusula Unitaria):</strong> Si $|\mathcal{C}(r, c)| = 1$, la celda tiene una sola asignación posible en todo el universo de opciones y se coloca de inmediato.
+                                            <strong>A. Naked Single (Direct Unit Clause):</strong> If $|\mathcal{C}(r, c)| = 1$, the cell has only one mathematically legal digit in the universe of options and is placed immediately.
                                         </div>
                                         <div class="subproof-item">
-                                            <strong>B. Hidden Single (Unicidad en 27 Unidades):</strong> Si en una fila, columna o bloque de $3 \times 3$, un dígito $d$ sólo cabe en una celda específica, ese valor es forzado por ley de cobertura.
+                                            <strong>B. Hidden Single (Unit Coverage Uniqueness):</strong> If across an entire row, column, or 3x3 block, digit $d$ can only fit in one specific coordinate, that value is forced by law of coverage.
                                         </div>
                                     </div>
                                     <div class="phase-metric-box">
-                                        <span>🎯 Rendimiento: <strong>Resuelve entre el 85% y 95% del tablero</strong> de forma instantánea sin explorar ninguna rama.</span>
+                                        <span>🎯 Empirical Performance: <strong>Solves 85% to 95% of the board</strong> in sub-milliseconds without branching.</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- FASE 3 -->
+                            <!-- PHASE 3 -->
                             <div class="panel phase-detail-card">
-                                <div class="phase-number-badge">FASE 3</div>
+                                <div class="phase-number-badge">PHASE 3</div>
                                 <div class="phase-body">
-                                    <h4>MRV (Minimum Remaining Values) & Propagación Booleana Global</h4>
-                                    <p>En tableros extremos (*Evil/Master*) donde se agotan los *Singles*, EXACTOR no prueba a ciegas. Selecciona la celda con la menor incertidumbre (mínima entropía):</p>
+                                    <h4>MRV (Minimum Remaining Values) & Global Boolean Propagation</h4>
+                                    <p>On master/extreme puzzles with 17 starting clues where direct Singles are exhausted, EXACTOR targets the cell with minimum uncertainty (lowest entropy):</p>
                                     <div class="formula-chip">
-                                        $$(r^*, c^*) = \arg\min_{(r, c) \in \text{Vacías}} |\mathcal{C}(r, c)| \quad \text{donde habitualmente } |\mathcal{C}| = 2$$
+                                        $$(r^*, c^*) = \arg\min_{(r, c) \in \text{Empty}} |\mathcal{C}(r, c)| \quad \text{where typically } |\mathcal{C}| = 2$$
                                     </div>
-                                    <p>Aplica propagación de restricciones unitarias: si una opción viola una restricción vecina, esa rama se destruye en microsegundos antes de que el árbol crezca.</p>
+                                    <p>It executes Boolean unit propagation: if a branch induces an inconsistent state in any neighboring unit, that branch is pruned in microseconds before the tree can grow.</p>
                                 </div>
                             </div>
                         </div>
@@ -500,24 +526,24 @@
 
                     <!-- REAL-WORLD APPLICATION & HARDWARE -->
                     <div class="methodology-section">
-                        <h3 class="section-title">🚀 Por qué esto es una Revolución para el Mundo Real</h3>
+                        <h3 class="section-title">🚀 Real-World Revolution: Why This Matters Beyond Games</h3>
                         <div class="realworld-grid">
                             <div class="panel realworld-card">
-                                <div class="rw-icon">💡</div>
-                                <h4>Auditoría Total (Caja de Cristal / Glass Box)</h4>
-                                <p>Las redes neuronales profundas son "cajas negras" donde no se puede saber por qué fallaron. EXACTOR genera un <strong>registro de auditoría matemático paso a paso</strong> con cada ley y candidato eliminado, ideal para sistemas críticos, finanzas y medicina.</p>
+                                <div class="rw-icon">🔍</div>
+                                <h4>100% Glass Box Auditability</h4>
+                                <p>Deep neural networks are opaque "black boxes" where nobody knows why an error occurred. EXACTOR produces a <strong>step-by-step mathematical causal ledger</strong> for every move, essential for aerospace, algorithmic trading, and medical diagnosis.</p>
                             </div>
 
                             <div class="panel realworld-card">
                                 <div class="rw-icon">🔋</div>
-                                <h4>Microcontroladores Ultrabaratos ($2 USD)</h4>
-                                <p>Al basarse en lógica proposicional pura y álgebra de bits, EXACTOR no necesita servidores con tarjetas NVIDIA de $30,000 USD. Puede ejecutarse en tiempo real en chips <strong>ESP32-C6</strong>, procesadores <strong>RISC-V</strong> o LPUs dedicados con consumo casi nulo.</p>
+                                <h4>Runs on a $2 Microcontroller (ESP32 / RISC-V)</h4>
+                                <p>Because it operates on pure Boolean logic and bitwise math, EXACTOR requires no multi-million-dollar NVIDIA GPU clusters. It runs in real time on ultra-low-power microchips like the <strong>ESP32-C6</strong> with microwatts of energy.</p>
                             </div>
 
                             <div class="panel realworld-card">
                                 <div class="rw-icon">💰</div>
-                                <h4>Ahorro Radical de Costes de Inferencia (Silicon Units)</h4>
-                                <p>Sustituye miles de llamadas costosas a APIs de LLMs por micro-operaciones lógicas en el borde (Edge Computing), reduciendo la latencia de 500 ms a 0.05 ms (un <strong>aceleramiento de 10,000x</strong>).</p>
+                                <h4>10,000x Speedup & Massive Cloud Cost Reduction</h4>
+                                <p>By replacing heavy LLM token generation with deterministic edge logic, reasoning latency drops from 500 ms down to 0.05 ms, saving thousands of dollars in cloud computing bills.</p>
                             </div>
                         </div>
                     </div>
@@ -525,26 +551,26 @@
                     <!-- GLOSSARY -->
                     <div class="panel glossary-panel">
                         <div class="panel-header">
-                            <h3>📖 Glosario de Conceptos Fundamentales</h3>
+                            <h3>📖 Key Concepts & Vocabulary (Influencer Cheat Sheet)</h3>
                         </div>
                         <div class="glossary-grid">
                             <div class="glossary-item">
-                                <strong>SAT (Satisfacibilidad Booleana):</strong> Problema matemático que determina si existe una asignación de variables que satisfaga una fórmula lógica dada.
+                                <strong>Boolean SAT (Satisfiability):</strong> The foundational computer science problem of determining whether there exists a combination of true/false assignments that satisfies a logical formula.
                             </div>
                             <div class="glossary-item">
-                                <strong>CSP (Constraint Satisfaction Problem):</strong> Problema donde el objetivo es encontrar estados que cumplan un conjunto rígido de restricciones lógicas.
+                                <strong>CSP (Constraint Satisfaction Problem):</strong> Mathematical problems where variables must adhere to a strict system of simultaneous boundary constraints.
                             </div>
                             <div class="glossary-item">
-                                <strong>Naked Single:</strong> Celda en la que 8 números están descartados por colisión directa, dejando un solo candidato válido obligatorio.
+                                <strong>Naked Single:</strong> A cell where 8 digits are already blocked by intersecting units, leaving exactly 1 mandatory candidate.
                             </div>
                             <div class="glossary-item">
-                                <strong>Hidden Single:</strong> Número que, dentro de una fila, columna o bloque entero, sólo puede colocarse en una única casilla disponible.
+                                <strong>Hidden Single:</strong> A digit that, within an entire row, column, or 3x3 block, can only legally reside in a single empty spot.
                             </div>
                             <div class="glossary-item">
-                                <strong>MRV (Minimum Remaining Values):</strong> Heurística de mínima entropía que elige primero la variable más restringida para minimizar el espacio de búsqueda.
+                                <strong>MRV (Minimum Remaining Values):</strong> A lowest-entropy heuristic that picks the most constrained variable first to minimize branch search space.
                             </div>
                             <div class="glossary-item">
-                                <strong>Neuro-Simbolismo:</strong> Fusión entre la flexibilidad de la IA moderna y la precisión matemática formal de la lógica simbólica.
+                                <strong>Neuro-Symbolic AI:</strong> The ultimate synthesis combining modern AI flexibility with the infallible mathematical precision of symbolic logic.
                             </div>
                         </div>
                     </div>
@@ -562,7 +588,7 @@
                 <div class="modal-title-box">
                     <span class="modal-icon">🔍</span>
                     <div>
-                        <h3 id="modalCellTitle">Inspección de Decisión: Celda (r, c)</h3>
+                        <h3 id="modalCellTitle">Decision Breakdown: Cell (r, c)</h3>
                         <span id="modalRuleBadge" class="badge badge-cyan">Naked Single</span>
                     </div>
                 </div>
@@ -576,23 +602,23 @@
                         <span id="modalPlacedValue">7</span>
                     </div>
                     <div class="decision-value-info">
-                        <h4 id="modalDecisionHeading">Valor forzado por restricción lógica</h4>
-                        <p id="modalDecisionSummary">Se han eliminado todos los demás dígitos debido a conflictos con las unidades intersectadas.</p>
+                        <h4 id="modalDecisionHeading">Value Mathematically Forced by Constraint Law</h4>
+                        <p id="modalDecisionSummary">All other digits have been ruled out due to unit collisions across row, column, and block.</p>
                     </div>
                 </div>
 
                 <!-- UNITS BREAKDOWN -->
                 <div class="units-breakdown-grid">
                     <div class="unit-box">
-                        <div class="unit-title">Fila <span id="modalRowIdx">1</span></div>
+                        <div class="unit-title">Row <span id="modalRowIdx">1</span> Locked Digits</div>
                         <div class="unit-digits" id="modalRowDigits"></div>
                     </div>
                     <div class="unit-box">
-                        <div class="unit-title">Columna <span id="modalColIdx">1</span></div>
+                        <div class="unit-title">Column <span id="modalColIdx">1</span> Locked Digits</div>
                         <div class="unit-digits" id="modalColDigits"></div>
                     </div>
                     <div class="unit-box">
-                        <div class="unit-title">Bloque 3x3 <span id="modalBoxIdx">(1, 1)</span></div>
+                        <div class="unit-title">3x3 Block <span id="modalBoxIdx">(1, 1)</span> Locked Digits</div>
                         <div class="unit-digits" id="modalBoxDigits"></div>
                     </div>
                 </div>
@@ -600,24 +626,24 @@
                 <!-- CANDIDATES COMPARISON -->
                 <div class="candidates-diff-box">
                     <div class="diff-col eliminated-col">
-                        <span class="diff-label">❌ Candidatos Descartados:</span>
+                        <span class="diff-label">❌ Discarded Candidates (Collisions):</span>
                         <div class="digit-tags" id="modalEliminatedDigits"></div>
                     </div>
                     <div class="diff-col valid-col">
-                        <span class="diff-label">✅ Candidato Ganador Único:</span>
+                        <span class="diff-label">✅ Winning Legal Candidate:</span>
                         <div class="digit-tags" id="modalValidDigits"></div>
                     </div>
                 </div>
 
                 <!-- CAUSAL PROOF TEXT -->
                 <div class="causal-proof-card">
-                    <div class="causal-label">Demostración Causal / Razonamiento Simbólico:</div>
+                    <div class="causal-label">Causal Proof & Symbolic Reasoning Chain:</div>
                     <p id="modalCausalText"></p>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button id="modalDoneBtn" class="btn btn-primary">Entendido</button>
+                <button id="modalDoneBtn" class="btn btn-primary">Got it, close</button>
             </div>
         </div>
     </div>

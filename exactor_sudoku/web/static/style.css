@@ -1295,11 +1295,88 @@ body {
     color: var(--text-primary);
 }
 
+/* ==========================================================================
+   ELI5 INFLUENCER ANALOGY BANNER
+   ========================================================================== */
+.eli5-banner {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.95));
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    border-radius: var(--radius-lg);
+}
+
+.eli5-icon {
+    font-size: 2.2rem;
+    padding-top: 0.25rem;
+}
+
+.eli5-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.eli5-content h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #f1f5f9;
+}
+
+.eli5-content p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.95rem;
+}
+
+.analogy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.analogy-box {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.poet-box { border-left: 4px solid #c084fc; }
+.robot-box { border-left: 4px solid #f87171; }
+.detective-box { 
+    border-left: 4px solid #38bdf8;
+    background: rgba(6, 182, 212, 0.08);
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+.analogy-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #f8fafc;
+}
+
+.analogy-box p {
+    font-size: 0.85rem !important;
+    line-height: 1.5;
+    color: #cbd5e1 !important;
+}
+
 @media (max-width: 900px) {
     .tri-pillar-grid,
     .realworld-grid,
     .glossary-grid,
-    .dual-subproof {
+    .dual-subproof,
+    .analogy-grid {
         grid-template-columns: 1fr;
+    }
+    .eli5-banner {
+        flex-direction: column;
     }
 }

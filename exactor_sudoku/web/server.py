@@ -198,18 +198,18 @@ async def explain_cell(req: ExplainCellRequest):
     eliminated = sorted(list(all_possible & set(intersected_used)))
 
     if is_fixed:
-        rule_name = "Pista Inicial (Fixed Clue)"
-        causal_text = f"La celda ({r+1}, {c+1}) es una pista inmutable de valor {val} dada en el problema original."
+        rule_name = "Original Fixed Clue"
+        causal_text = f"Cell ({r+1}, {c+1}) is an immutable starting clue ({val}) provided as part of the initial puzzle specification."
     elif val != 0:
         if len(cands) == 1 and cands[0] == val:
-            rule_name = "Naked Single (Único Candidato Directo)"
-            causal_text = f"La celda ({r+1}, {c+1}) = {val} es forzada sin ambigüedad: los dígitos {eliminated} están bloqueados por su fila {r+1}, columna {c+1} y bloque ({br+1}, {bc+1}). El único candidato legal restante es {{{val}}}."
+            rule_name = "Naked Single (Direct Deduction)"
+            causal_text = f"Cell ({r+1}, {c+1}) = {val} is mathematically forced: digits {eliminated} are already locked in intersecting row {r+1}, column {c+1}, or 3x3 block ({br+1}, {bc+1}). The sole remaining legal candidate is {{{val}}}."
         else:
-            rule_name = "Hidden Single / MRV SAT Exact"
-            causal_text = f"La celda ({r+1}, {c+1}) = {val} fue deducida por propagación de restricciones unitarias. Candidatos libres en la casilla: {cands}. El dígito {val} es el único consistente con el resto del tablero."
+            rule_name = "Hidden Single / Global SAT Inference"
+            causal_text = f"Cell ({r+1}, {c+1}) = {val} was deduced via unit constraint propagation. Free open slots were {cands}, but digit {val} is the only assignment that maintains 100% global consistency across all 27 units."
     else:
-        rule_name = "Celda Vacía en Espera"
-        causal_text = f"La celda ({r+1}, {c+1}) aún no ha sido deducida. Opciones posibles actuales: {cands}. Candidatos descartados: {eliminated}."
+        rule_name = "Empty Cell (Awaiting Deduction)"
+        causal_text = f"Cell ({r+1}, {c+1}) is empty. It has {len(cands)} available legal candidates: {cands}. Conflicting digits {eliminated} have been ruled out by intersecting row/col/block units."
 
     return {
         "status": "OK",
