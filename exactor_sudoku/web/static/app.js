@@ -1,5 +1,5 @@
 /**
- * Exactor Sudoku Arena: Frontend Logic & Sound Synthesizer
+ * Exactor Sudoku Arena: Enhanced Interactive Frontend & Sound Synthesizer
  */
 
 class SoundEngine {
@@ -32,6 +32,23 @@ class SoundEngine {
         osc.stop(this.ctx.currentTime + 0.05);
     }
 
+    playConflict() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(120, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+    }
+
     playWin() {
         if (!this.enabled) return;
         this.init();
@@ -58,7 +75,9 @@ const sounds = new SoundEngine();
 const state = {
     sessionId: 'session_sdk_' + Math.random().toString(36).substring(2, 9),
     grid: null,
+    candidates: {},
     selectedCell: null,
+    lastPlacedCell: null,
     isAutoPlaying: false,
     autoPlayTimeout: null,
     autoPlaySpeed: 60,
@@ -158,13 +177,33 @@ function setupEvents() {
         });
     });
 
-    // Keyboard support
+    // Keyboard & Arrow key navigation
     document.addEventListener('keydown', (e) => {
-        if (!state.selectedCell) return;
+        if (!state.selectedCell) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                state.selectedCell = { r: 4, c: 4 };
+                renderGrid(state.grid, gridEl, handleCellClick);
+            }
+            return;
+        }
+
+        let { r, c } = state.selectedCell;
         if (e.key >= '1' && e.key <= '9') {
-            setUserCell(state.selectedCell.r, state.selectedCell.c, parseInt(e.key));
+            setUserCell(r, c, parseInt(e.key));
         } else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') {
-            setUserCell(state.selectedCell.r, state.selectedCell.c, 0);
+            setUserCell(r, c, 0);
+        } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+            state.selectedCell = { r: Math.max(0, r - 1), c };
+            renderGrid(state.grid, gridEl, handleCellClick);
+        } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+            state.selectedCell = { r: Math.min(8, r + 1), c };
+            renderGrid(state.grid, gridEl, handleCellClick);
+        } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+            state.selectedCell = { r, c: Math.max(0, c - 1) };
+            renderGrid(state.grid, gridEl, handleCellClick);
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+            state.selectedCell = { r, c: Math.min(8, c + 1) };
+            renderGrid(state.grid, gridEl, handleCellClick);
         }
     });
 
@@ -188,6 +227,7 @@ async function startNewPuzzle() {
     stopTimer();
     state.secondsElapsed = 0;
     state.selectedCell = null;
+    state.lastPlacedCell = null;
     updateTimerDisplay(0);
     statusFaceBtn.textContent = '🧠';
 
@@ -200,6 +240,7 @@ async function startNewPuzzle() {
         });
         const data = await res.json();
         state.grid = data.grid;
+        state.candidates = data.candidates || {};
         renderGrid(state.grid, gridEl, handleCellClick);
         updateStats();
         startTimer();
@@ -211,9 +252,16 @@ async function startNewPuzzle() {
 }
 
 function renderGrid(gridObj, targetEl, clickHandler) {
+    if (!gridObj || !gridObj.grid) return;
     targetEl.innerHTML = '';
     const grid = gridObj.grid;
     const fixed = gridObj.initial_fixed;
+    const conflicts = gridObj.conflicts || [];
+
+    const sel = state.selectedCell;
+    const selVal = (sel && grid[sel.r]) ? grid[sel.r][sel.c] : 0;
+    const selBlockR = sel ? Math.floor(sel.r / 3) : -1;
+    const selBlockC = sel ? Math.floor(sel.c / 3) : -1;
 
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
@@ -232,8 +280,27 @@ function renderGrid(gridObj, targetEl, clickHandler) {
                 cell.textContent = '';
             }
 
-            if (state.selectedCell && state.selectedCell.r === r && state.selectedCell.c === c) {
-                cell.classList.add('selected');
+            // Highlighting logic
+            if (sel) {
+                if (sel.r === r && sel.c === c) {
+                    cell.classList.add('selected');
+                } else if (sel.r === r || sel.c === c || (Math.floor(r / 3) === selBlockR && Math.floor(c / 3) === selBlockC)) {
+                    cell.classList.add('highlighted');
+                }
+
+                if (val !== 0 && selVal !== 0 && val === selVal) {
+                    cell.classList.add('same-number');
+                }
+            }
+
+            // Conflict check
+            if (conflicts.some(coord => coord[0] === r && coord[1] === c)) {
+                cell.classList.add('conflict');
+            }
+
+            // Just placed animation
+            if (state.lastPlacedCell && state.lastPlacedCell.r === r && state.lastPlacedCell.c === c) {
+                cell.classList.add('just-placed');
             }
 
             if (clickHandler) {
@@ -246,9 +313,14 @@ function renderGrid(gridObj, targetEl, clickHandler) {
 }
 
 function handleCellClick(r, c) {
-    if (state.grid.initial_fixed[r][c]) return;
     state.selectedCell = { r, c };
     renderGrid(state.grid, gridEl, handleCellClick);
+
+    const val = state.grid.grid[r][c];
+    if (val === 0 && state.candidates) {
+        const cands = state.candidates[`${r}_${c}`] || [];
+        explanationText.textContent = `Cell (${r+1}, ${c+1}) Candidates: [ ${cands.join(', ') || 'none'} ]`;
+    }
 }
 
 async function setUserCell(r, c, val) {
@@ -262,9 +334,16 @@ async function setUserCell(r, c, val) {
         });
         const data = await res.json();
         state.grid = data.grid;
+        state.candidates = data.candidates || {};
+        state.lastPlacedCell = { r, c };
         renderGrid(state.grid, gridEl, handleCellClick);
         updateStats();
-        sounds.playPlace();
+
+        if (state.grid.violations > 0) {
+            sounds.playConflict();
+        } else {
+            sounds.playPlace();
+        }
 
         if (state.grid.is_complete) {
             handleVictory();
@@ -291,10 +370,14 @@ async function executeAIStep() {
         }
 
         state.grid = data.grid;
+        state.candidates = data.candidates || {};
+        const act = data.action;
+
+        state.selectedCell = { r: act.row, c: act.col };
+        state.lastPlacedCell = { r: act.row, c: act.col };
         renderGrid(state.grid, gridEl, handleCellClick);
         updateStats();
 
-        const act = data.action;
         lastLatencyText.textContent = `${act.metadata.latency_ms} ms`;
         explanationText.textContent = act.explanation;
 
@@ -434,7 +517,6 @@ async function runDuelLoop() {
         });
         const data = await res.json();
 
-        // Render Exactor Grid
         renderGrid(data.exactor.grid, duelGridExactor);
         const exStats = data.exactor.stats;
         const avgLatEx = exStats.moves > 0 ? (exStats.latency_ms / exStats.moves) : 0.03;
@@ -444,7 +526,6 @@ async function runDuelLoop() {
             exactorDuelLog.textContent = data.exactor.step.explanation;
         }
 
-        // Render Jev Grid
         renderGrid(data.jev.grid, duelGridJev);
         const jvStats = data.jev.stats;
         const avgLatJv = jvStats.moves > 0 ? (jvStats.latency_ms / jvStats.moves) : 420.0;
@@ -549,7 +630,6 @@ function renderCharts(result) {
         const maxVal = Math.max(jev.avg_latency_per_move_ms, 10);
         const startY = 140;
 
-        // Jev Bar
         const hJev = (jev.avg_latency_per_move_ms / maxVal) * 100;
         ctx.fillStyle = '#a855f7';
         ctx.fillRect(80, startY - hJev, 60, hJev);
@@ -558,7 +638,6 @@ function renderCharts(result) {
         ctx.fillText(`${jev.avg_latency_per_move_ms.toFixed(1)} ms`, 80, startY - hJev - 8);
         ctx.fillText('Pure JEV', 85, startY + 20);
 
-        // Exactor Bar
         const hEx = Math.max(2, (exactor.avg_latency_per_move_ms / maxVal) * 100);
         ctx.fillStyle = '#06b6d4';
         ctx.fillRect(220, startY - hEx, 60, hEx);
@@ -576,7 +655,6 @@ function renderCharts(result) {
         ctx.clearRect(0, 0, canvasAcc.width, canvasAcc.height);
         const startY = 140;
 
-        // Jev
         const hJev = (jev.solve_rate_pct / 100) * 100;
         ctx.fillStyle = '#a855f7';
         ctx.fillRect(80, startY - hJev, 60, hJev);
@@ -585,7 +663,6 @@ function renderCharts(result) {
         ctx.fillText(`${jev.solve_rate_pct.toFixed(1)}%`, 85, startY - hJev - 8);
         ctx.fillText('Pure JEV', 85, startY + 20);
 
-        // Exactor
         const hEx = (exactor.solve_rate_pct / 100) * 100;
         ctx.fillStyle = '#10b981';
         ctx.fillRect(220, startY - hEx, 60, hEx);

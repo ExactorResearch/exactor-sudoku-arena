@@ -31,4 +31,4 @@ def test_duplicate_violation_detection():
     grid = SudokuGrid()
     grid.set_cell(0, 0, 5)
     grid.set_cell(0, 8, 5)  # Duplicate in row 0
-    assert grid.count_duplicate_violations() == 1
+    assert grid.count_duplicate_violations() == 2

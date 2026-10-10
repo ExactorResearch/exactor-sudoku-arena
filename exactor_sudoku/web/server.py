@@ -5,7 +5,7 @@ FastAPI Server for Interactive Sudoku Arena & Real-Time AI Duel Visualizer.
 import os
 import time
 import random
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
@@ -29,6 +29,13 @@ agents_pool = {
     "jev": JevPureSudokuAgent(),
     "backtrack": BacktrackingSudokuAgent(),
 }
+
+
+def serialize_candidates(grid: SudokuGrid) -> Dict[str, List[int]]:
+    return {
+        f"{r}_{c}": sorted(list(cands))
+        for (r, c), cands in grid.get_all_candidates().items()
+    }
 
 
 class NewGameRequest(BaseModel):
@@ -94,7 +101,7 @@ async def new_sudoku(req: NewGameRequest):
         "status": "CREATED",
         "session_id": req.session_id,
         "grid": grid_main.to_dict(),
-        "candidates": grid_main.get_all_candidates(),
+        "candidates": serialize_candidates(grid_main),
         "duel_grids": {
             "exactor": grid_exactor.to_dict(),
             "jev": grid_jev.to_dict(),
@@ -116,7 +123,7 @@ async def set_cell(req: UserSetCellRequest):
     return {
         "status": "OK",
         "grid": grid.to_dict(),
-        "candidates": grid.get_all_candidates(),
+        "candidates": serialize_candidates(grid),
     }
 
 
@@ -150,7 +157,7 @@ async def ai_step(req: AIStepRequest):
             "metadata": action.metadata,
         },
         "grid": grid.to_dict(),
-        "candidates": grid.get_all_candidates(),
+        "candidates": serialize_candidates(grid),
     }
 
 
@@ -229,6 +236,6 @@ async def run_benchmark_endpoint(req: BenchmarkRequest):
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
-def start_server(host: str = "0.0.0.0", port: int = 8000):
+def start_server(host: str = "0.0.0.0", port: int = 8001):
     import uvicorn
     uvicorn.run(app, host=host, port=port)

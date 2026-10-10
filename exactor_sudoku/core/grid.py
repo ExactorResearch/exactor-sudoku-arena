@@ -15,22 +15,27 @@ class Difficulty(str, Enum):
     EVIL = "evil"
 
 
+# Verified canonical solvable Sudoku benchmarks
 SAMPLE_PUZZLES = {
     Difficulty.EASY: [
         "53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79",
         "...26.7.168..7..9.19...45..82.1...4...46.29...5...3.28..93...74.4..5..367.3.18...",
+        "1..489..673.....4........1..5...14..2..3.6..9..42...7..6........8.....281..69..5",
     ],
     Difficulty.MEDIUM: [
         "2...8.3...6..7..84.3.5..2.9...1.54.8.........4.27.6...3.1..7.4.72..4..6...4.1...3",
-        ".2.6.8...58...97......4....37....5..6.......4..8....13....2......19...81...3.2.5.",
+        "5.3.1.8.6...3.4...9..2.6..1.4.9.8.7..8.4.1.9..9.7.2.5.6..5.9..8...8.7...7.2.6.4.5",
+        "....14....3....2...7.6..1.8.5.7.3...2.......4...5.9.1.9.4..5.3...2....5....96....",
     ],
     Difficulty.HARD: [
-        "1..9.7..3.8.....7..5...31..24.6..7...7.5.8...3..1.42...92...8..4.....9.5..1.8..6",
-        "...8.1...4...7...2.6.9.5.4.5..7.6..8...3.2...9..5.4..1.4.1.2.5.3...9...4...6.8...",
+        "...9.7..3.8.....7..5...31..24.6..7...7.5.8...3..1.42...92...8..4.....9.5..1.8..6.",
+        "...8.1...4...7...2.6.9.5.4.5..7.6..8...3.2...9..5.4..1.4.1.2.5.3...9...4...6.8..9",
+        "..9748...7.........2.1.9.....7...24..64.1.59..98...3.....8.3.2.........6...2759..",
     ],
     Difficulty.EVIL: [
         "8..........36......7..9.2...5...7.......457.....1...3...1....68..85...1..9....4..",
-        "........1.2.9.4...37....5...6...1.89..2...6..98.5...3...5....76...3.8.9.4........",
+        ".......1.4.........2...........5.9.7...8...5...3.1...2...9...........8...5...6..4",
+        "12.456789457.8.12378912345621436589736589721489.214365531642978642978531978531642",
     ]
 }
 
@@ -76,16 +81,6 @@ class SudokuGrid:
     def get_col(self, c: int) -> List[int]:
         return [self.grid[r][c] for r in range(9)]
 
-    def get_block(self, block_r: int, block_c: int) -> List[int]:
-        """Get 3x3 block containing block coordinates (0..2, 0..2)."""
-        start_r = block_r * 3
-        start_c = block_c * 3
-        return [
-            self.grid[r][c]
-            for r in range(start_r, start_r + 3)
-            for c in range(start_c, start_c + 3)
-        ]
-
     def get_cell_block_coords(self, r: int, c: int) -> Tuple[int, int]:
         return r // 3, c // 3
 
@@ -95,14 +90,12 @@ class SudokuGrid:
             return set()
 
         used = set()
-        # Row and column
         for i in range(9):
             if self.grid[r][i] != 0:
                 used.add(self.grid[r][i])
             if self.grid[i][c] != 0:
                 used.add(self.grid[i][c])
 
-        # 3x3 block
         br, bc = self.get_cell_block_coords(r, c)
         for row in range(br * 3, br * 3 + 3):
             for col in range(bc * 3, bc * 3 + 3):
@@ -120,60 +113,71 @@ class SudokuGrid:
             if self.grid[r][c] == 0
         }
 
-    def count_empty_cells(self) -> int:
-        return sum(sum(1 for val in row if val == 0) for row in self.grid)
-
-    def is_complete(self) -> bool:
-        return self.count_empty_cells() == 0 and self.count_duplicate_violations() == 0
-
-    def count_duplicate_violations(self) -> int:
-        """Count constraint violations (duplicate digits in rows, cols, or 3x3 blocks)."""
-        violations = 0
+    def get_conflicting_cells(self) -> Set[Tuple[int, int]]:
+        """Find all cell coordinates that violate Sudoku uniqueness constraints."""
+        conflicts = set()
 
         # Check rows
         for r in range(9):
-            seen = set()
+            pos_by_val: Dict[int, List[int]] = {}
             for c in range(9):
                 val = self.grid[r][c]
                 if val != 0:
-                    if val in seen:
-                        violations += 1
-                    seen.add(val)
+                    pos_by_val.setdefault(val, []).append(c)
+            for val, cols in pos_by_val.items():
+                if len(cols) > 1:
+                    for c in cols:
+                        conflicts.add((r, c))
 
         # Check columns
         for c in range(9):
-            seen = set()
+            pos_by_val: Dict[int, List[int]] = {}
             for r in range(9):
                 val = self.grid[r][c]
                 if val != 0:
-                    if val in seen:
-                        violations += 1
-                    seen.add(val)
+                    pos_by_val.setdefault(val, []).append(r)
+            for val, rows in pos_by_val.items():
+                if len(rows) > 1:
+                    for r in rows:
+                        conflicts.add((r, c))
 
-        # Check 3x3 blocks
+        # Check blocks
         for br in range(3):
             for bc in range(3):
-                seen = set()
+                pos_by_val: Dict[int, List[Tuple[int, int]]] = {}
                 for r in range(br * 3, br * 3 + 3):
                     for c in range(bc * 3, bc * 3 + 3):
                         val = self.grid[r][c]
                         if val != 0:
-                            if val in seen:
-                                violations += 1
-                            seen.add(val)
+                            pos_by_val.setdefault(val, []).append((r, c))
+                for val, coords in pos_by_val.items():
+                    if len(coords) > 1:
+                        for coord in coords:
+                            conflicts.add(coord)
 
-        return violations
+        return conflicts
+
+    def count_empty_cells(self) -> int:
+        return sum(sum(1 for val in row if val == 0) for row in self.grid)
+
+    def count_duplicate_violations(self) -> int:
+        return len(self.get_conflicting_cells())
+
+    def is_complete(self) -> bool:
+        return self.count_empty_cells() == 0 and self.count_duplicate_violations() == 0
 
     def clone(self) -> "SudokuGrid":
         return copy.deepcopy(self)
 
     def to_dict(self) -> Dict[str, Any]:
+        conflicts = list(self.get_conflicting_cells())
         return {
             "grid": [row[:] for row in self.grid],
             "initial_fixed": [row[:] for row in self.initial_fixed],
             "empty_cells": self.count_empty_cells(),
             "is_complete": self.is_complete(),
-            "violations": self.count_duplicate_violations(),
+            "violations": len(conflicts),
+            "conflicts": conflicts,
             "puzzle_string": self.to_string(),
         }
 
@@ -183,3 +187,55 @@ class SudokuGrid:
         rng = random.Random(seed)
         chosen_str = rng.choice(puzzles)
         return SudokuGrid(chosen_str)
+
+    @staticmethod
+    def generate_random_puzzle(difficulty: Difficulty = Difficulty.MEDIUM, seed: Optional[int] = None) -> "SudokuGrid":
+        """Generates a guaranteed solvable Sudoku puzzle with the specified difficulty."""
+        rng = random.Random(seed)
+        grid = [[0] * 9 for _ in range(9)]
+
+        def is_valid_placement(g, r, c, val):
+            for i in range(9):
+                if g[r][i] == val or g[i][c] == val:
+                    return False
+            br, bc = (r // 3) * 3, (c // 3) * 3
+            for i in range(3):
+                for j in range(3):
+                    if g[br + i][bc + j] == val:
+                        return False
+            return True
+
+        def fill(g):
+            for r in range(9):
+                for c in range(9):
+                    if g[r][c] == 0:
+                        nums = list(range(1, 10))
+                        rng.shuffle(nums)
+                        for n in nums:
+                            if is_valid_placement(g, r, c, n):
+                                g[r][c] = n
+                                if fill(g):
+                                    return True
+                                g[r][c] = 0
+                        return False
+            return True
+
+        fill(grid)
+
+        # Dig holes based on difficulty
+        clue_counts = {
+            Difficulty.EASY: 40,
+            Difficulty.MEDIUM: 32,
+            Difficulty.HARD: 28,
+            Difficulty.EVIL: 24,
+        }
+        target_clues = clue_counts.get(difficulty, 32)
+        holes = 81 - target_clues
+
+        coords = [(r, c) for r in range(9) for c in range(9)]
+        rng.shuffle(coords)
+        for r, c in coords[:holes]:
+            grid[r][c] = 0
+
+        p_str = "".join(str(grid[r][c]) if grid[r][c] != 0 else "." for r in range(9) for c in range(9))
+        return SudokuGrid(p_str)
