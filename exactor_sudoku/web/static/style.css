@@ -1018,3 +1018,288 @@ body {
     justify-content: flex-end;
     background: rgba(15, 23, 42, 0.5);
 }
+
+/* ==========================================================================
+   METODOLOGÍA & ARCHITECTURE WHITEPAPER STYLES
+   ========================================================================== */
+.methodology-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-bottom: 2rem;
+}
+
+.methodology-hero {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 182, 212, 0.12));
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    border-radius: var(--radius-lg);
+    padding: 2.25rem;
+    box-shadow: var(--shadow-glow);
+}
+
+.hero-badge-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.methodology-hero h2 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    margin: 0 0 0.85rem 0;
+    color: var(--text-primary);
+}
+
+.hero-lead {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    margin: 0;
+}
+
+.methodology-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+}
+
+/* 3-PILLAR GRID */
+.tri-pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.pillar-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: var(--transition-normal);
+}
+
+.pillar-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.llm-pillar { border-color: rgba(168, 85, 247, 0.4); }
+.dfs-pillar { border-color: rgba(239, 68, 68, 0.4); }
+.exactor-pillar { 
+    border-color: rgba(6, 182, 212, 0.6); 
+    background: linear-gradient(180deg, rgba(6, 182, 212, 0.08), rgba(15, 23, 42, 0.95));
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
+}
+
+.pillar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.pillar-icon { font-size: 1.3rem; }
+
+.pillar-header h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+}
+
+.pillar-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    width: fit-content;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+}
+
+.pillar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.pillar-list strong { color: var(--text-primary); }
+
+/* PHASE CARDS */
+.phase-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.phase-detail-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+}
+
+.phase-number-badge {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.12);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.8rem;
+    height: fit-content;
+    white-space: nowrap;
+}
+
+.phase-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.phase-body h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+}
+
+.phase-body p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
+.formula-chip {
+    background: #080c16;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-left: 4px solid var(--accent-cyan);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1.25rem;
+    margin: 0.4rem 0;
+    overflow-x: auto;
+}
+
+.dual-subproof {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 0.5rem 0;
+}
+
+.subproof-item {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.phase-metric-box {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.phase-metric-box strong { color: var(--accent-cyan); }
+
+/* REAL-WORLD APPLICATION */
+.realworld-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.realworld-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+}
+
+.rw-icon { font-size: 1.75rem; }
+
+.realworld-card h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+}
+
+.realworld-card p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+/* GLOSSARY */
+.glossary-panel {
+    background: #090e1a;
+    border: 1px solid var(--border-color);
+    padding: 1.75rem;
+    border-radius: var(--radius-md);
+}
+
+.glossary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.glossary-item {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--accent-purple);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.glossary-item strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+    .tri-pillar-grid,
+    .realworld-grid,
+    .glossary-grid,
+    .dual-subproof {
+        grid-template-columns: 1fr;
+    }
+}
