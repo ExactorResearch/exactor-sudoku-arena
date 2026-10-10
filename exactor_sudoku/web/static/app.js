@@ -149,6 +149,18 @@ function setupTabs() {
             btn.classList.add('active');
             const pane = document.getElementById(btn.getAttribute('data-tab'));
             if (pane) pane.classList.add('active');
+
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    throwOnError: false
+                });
+            }
         });
     });
 }
