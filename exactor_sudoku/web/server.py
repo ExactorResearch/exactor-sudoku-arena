@@ -161,6 +161,72 @@ async def ai_step(req: AIStepRequest):
     }
 
 
+class ExplainCellRequest(BaseModel):
+    session_id: str = "default"
+    row: int
+    col: int
+
+
+@app.post("/api/sudoku/explain-cell")
+async def explain_cell(req: ExplainCellRequest):
+    sess = sessions.get(req.session_id)
+    if not sess:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    grid: SudokuGrid = sess["grid_main"]
+    r, c = req.row, req.col
+    if not (0 <= r < 9 and 0 <= c < 9):
+        raise HTTPException(status_code=400, detail="Invalid cell coordinates")
+
+    val = grid.get_cell(r, c)
+    is_fixed = grid.initial_fixed[r][c]
+
+    # Inspect intersecting units
+    row_digits = [grid.get_cell(r, j) for j in range(9) if j != c and grid.get_cell(r, j) != 0]
+    col_digits = [grid.get_cell(i, c) for i in range(9) if i != r and grid.get_cell(i, c) != 0]
+    br, bc = r // 3, c // 3
+    box_digits = [
+        grid.get_cell(i, j)
+        for i in range(br * 3, br * 3 + 3)
+        for j in range(bc * 3, bc * 3 + 3)
+        if (i != r or j != c) and grid.get_cell(i, j) != 0
+    ]
+
+    intersected_used = sorted(list(set(row_digits + col_digits + box_digits)))
+    all_possible = set(range(1, 10))
+    cands = sorted(list(all_possible - set(intersected_used)))
+    eliminated = sorted(list(all_possible & set(intersected_used)))
+
+    if is_fixed:
+        rule_name = "Pista Inicial (Fixed Clue)"
+        causal_text = f"La celda ({r+1}, {c+1}) es una pista inmutable de valor {val} dada en el problema original."
+    elif val != 0:
+        if len(cands) == 1 and cands[0] == val:
+            rule_name = "Naked Single (Único Candidato Directo)"
+            causal_text = f"La celda ({r+1}, {c+1}) = {val} es forzada sin ambigüedad: los dígitos {eliminated} están bloqueados por su fila {r+1}, columna {c+1} y bloque ({br+1}, {bc+1}). El único candidato legal restante es {{{val}}}."
+        else:
+            rule_name = "Hidden Single / MRV SAT Exact"
+            causal_text = f"La celda ({r+1}, {c+1}) = {val} fue deducida por propagación de restricciones unitarias. Candidatos libres en la casilla: {cands}. El dígito {val} es el único consistente con el resto del tablero."
+    else:
+        rule_name = "Celda Vacía en Espera"
+        causal_text = f"La celda ({r+1}, {c+1}) aún no ha sido deducida. Opciones posibles actuales: {cands}. Candidatos descartados: {eliminated}."
+
+    return {
+        "status": "OK",
+        "row": r + 1,
+        "col": c + 1,
+        "current_value": val,
+        "is_fixed": is_fixed,
+        "rule_name": rule_name,
+        "row_digits": sorted(list(set(row_digits))),
+        "col_digits": sorted(list(set(col_digits))),
+        "box_digits": sorted(list(set(box_digits))),
+        "eliminated_digits": eliminated,
+        "valid_candidates": cands,
+        "causal_text": causal_text,
+    }
+
+
 @app.post("/api/sudoku/duel-step")
 async def duel_step(req: DuelStepRequest):
     sess = sessions.get(req.session_id)

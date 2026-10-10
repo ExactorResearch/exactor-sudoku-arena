@@ -149,12 +149,34 @@
                             <div id="sudokuGrid" class="sudoku-grid"></div>
                         </div>
 
-                        <!-- EXPLANATION BANNER -->
+                        <!-- EXPLANATION BANNER & WHY BUTTON -->
                         <div class="explanation-box">
                             <div class="exp-icon">💡</div>
                             <div class="exp-content">
-                                <div class="exp-title">Algebraic Causal Proof:</div>
-                                <div id="explanationText" class="exp-body">Click an empty cell or press "AI Deduction Step" to watch Exactor resolve Naked/Hidden Singles in microseconds.</div>
+                                <div class="exp-header-row">
+                                    <div class="exp-title">Algebraic Causal Proof / Justificación Lógica:</div>
+                                    <button id="explainSelectedCellBtn" class="btn btn-outline btn-sm">🔍 ¿Por qué esta celda?</button>
+                                </div>
+                                <div id="explanationText" class="exp-body">Haz clic en cualquier celda o presiona "⚡ AI Deduction Step" para ver por qué el motor toma cada decisión en microsegundos.</div>
+                            </div>
+                        </div>
+
+                        <!-- LIVE SYMBOLIC RULE LEDGER -->
+                        <div class="rule-ledger-panel">
+                            <div class="ledger-header">
+                                <div class="ledger-title">
+                                    <span class="ledger-icon">📋</span>
+                                    <h4>Registro de Reglas Deducidas en Vivo</h4>
+                                </div>
+                                <div class="ledger-summary-badges">
+                                    <span class="badge badge-cyan"><strong id="countNakedSingles">0</strong> Naked Singles</span>
+                                    <span class="badge badge-purple"><strong id="countHiddenSingles">0</strong> Hidden Singles</span>
+                                    <span class="badge badge-green"><strong id="countMrvBranches">0</strong> MRV Branches</span>
+                                    <span class="badge badge-outline"><strong id="countTotalRules">0</strong> Total</span>
+                                </div>
+                            </div>
+                            <div id="ruleLedgerList" class="rule-ledger-list">
+                                <div class="ledger-empty-state">No se han ejecutado deducciones aún. Presiona "⚡ AI Deduction Step" o "▶ Auto Solve".</div>
                             </div>
                         </div>
                     </div>
@@ -352,6 +374,73 @@
             </section>
 
         </main>
+    </div>
+
+    <!-- DECISION INSPECTOR MODAL -->
+    <div id="decisionModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-box">
+                    <span class="modal-icon">🔍</span>
+                    <div>
+                        <h3 id="modalCellTitle">Inspección de Decisión: Celda (r, c)</h3>
+                        <span id="modalRuleBadge" class="badge badge-cyan">Naked Single</span>
+                    </div>
+                </div>
+                <button id="closeModalBtn" class="btn btn-icon close-btn">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- VALUE PROMINENCE -->
+                <div class="decision-value-banner">
+                    <div class="decision-value-circle">
+                        <span id="modalPlacedValue">7</span>
+                    </div>
+                    <div class="decision-value-info">
+                        <h4 id="modalDecisionHeading">Valor forzado por restricción lógica</h4>
+                        <p id="modalDecisionSummary">Se han eliminado todos los demás dígitos debido a conflictos con las unidades intersectadas.</p>
+                    </div>
+                </div>
+
+                <!-- UNITS BREAKDOWN -->
+                <div class="units-breakdown-grid">
+                    <div class="unit-box">
+                        <div class="unit-title">Fila <span id="modalRowIdx">1</span></div>
+                        <div class="unit-digits" id="modalRowDigits"></div>
+                    </div>
+                    <div class="unit-box">
+                        <div class="unit-title">Columna <span id="modalColIdx">1</span></div>
+                        <div class="unit-digits" id="modalColDigits"></div>
+                    </div>
+                    <div class="unit-box">
+                        <div class="unit-title">Bloque 3x3 <span id="modalBoxIdx">(1, 1)</span></div>
+                        <div class="unit-digits" id="modalBoxDigits"></div>
+                    </div>
+                </div>
+
+                <!-- CANDIDATES COMPARISON -->
+                <div class="candidates-diff-box">
+                    <div class="diff-col eliminated-col">
+                        <span class="diff-label">❌ Candidatos Descartados:</span>
+                        <div class="digit-tags" id="modalEliminatedDigits"></div>
+                    </div>
+                    <div class="diff-col valid-col">
+                        <span class="diff-label">✅ Candidato Ganador Único:</span>
+                        <div class="digit-tags" id="modalValidDigits"></div>
+                    </div>
+                </div>
+
+                <!-- CAUSAL PROOF TEXT -->
+                <div class="causal-proof-card">
+                    <div class="causal-label">Demostración Causal / Razonamiento Simbólico:</div>
+                    <p id="modalCausalText"></p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modalDoneBtn" class="btn btn-primary">Entendido</button>
+            </div>
+        </div>
     </div>
 
     <script src="/static/app.js"></script>

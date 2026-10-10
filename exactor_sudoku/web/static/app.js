@@ -87,6 +87,9 @@ const state = {
 
     isDuelRunning: false,
     duelInterval: null,
+
+    ruleHistory: [],
+    ruleCounts: { naked: 0, hidden: 0, mrv: 0, total: 0 },
 };
 
 // DOM Elements
@@ -108,6 +111,33 @@ const emptyCellsCountText = document.getElementById('emptyCellsCountText');
 const violationsText = document.getElementById('violationsText');
 const apiSavedText = document.getElementById('apiSavedText');
 const explanationText = document.getElementById('explanationText');
+const explainSelectedCellBtn = document.getElementById('explainSelectedCellBtn');
+
+// Rule Ledger Elements
+const countNakedSingles = document.getElementById('countNakedSingles');
+const countHiddenSingles = document.getElementById('countHiddenSingles');
+const countMrvBranches = document.getElementById('countMrvBranches');
+const countTotalRules = document.getElementById('countTotalRules');
+const ruleLedgerList = document.getElementById('ruleLedgerList');
+
+// Decision Modal Elements
+const decisionModal = document.getElementById('decisionModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const modalDoneBtn = document.getElementById('modalDoneBtn');
+const modalCellTitle = document.getElementById('modalCellTitle');
+const modalRuleBadge = document.getElementById('modalRuleBadge');
+const modalPlacedValue = document.getElementById('modalPlacedValue');
+const modalDecisionHeading = document.getElementById('modalDecisionHeading');
+const modalDecisionSummary = document.getElementById('modalDecisionSummary');
+const modalRowIdx = document.getElementById('modalRowIdx');
+const modalColIdx = document.getElementById('modalColIdx');
+const modalBoxIdx = document.getElementById('modalBoxIdx');
+const modalRowDigits = document.getElementById('modalRowDigits');
+const modalColDigits = document.getElementById('modalColDigits');
+const modalBoxDigits = document.getElementById('modalBoxDigits');
+const modalEliminatedDigits = document.getElementById('modalEliminatedDigits');
+const modalValidDigits = document.getElementById('modalValidDigits');
+const modalCausalText = document.getElementById('modalCausalText');
 
 // Duel Elements
 const startDuelBtn = document.getElementById('startDuelBtn');
@@ -224,6 +254,27 @@ function setupEvents() {
         e.target.textContent = sounds.enabled ? '🔊' : '🔇';
     });
 
+    // Decision Inspector Modal Triggers
+    if (explainSelectedCellBtn) {
+        explainSelectedCellBtn.addEventListener('click', () => {
+            if (state.selectedCell) {
+                openDecisionInspector(state.selectedCell.r, state.selectedCell.c);
+            } else if (state.lastPlacedCell) {
+                openDecisionInspector(state.lastPlacedCell.r, state.lastPlacedCell.c);
+            } else {
+                openDecisionInspector(0, 0);
+            }
+        });
+    }
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', () => decisionModal.classList.add('hidden'));
+    if (modalDoneBtn) modalDoneBtn.addEventListener('click', () => decisionModal.classList.add('hidden'));
+    if (decisionModal) {
+        decisionModal.addEventListener('click', (e) => {
+            if (e.target === decisionModal) decisionModal.classList.add('hidden');
+        });
+    }
+
     // Duel Listeners
     startDuelBtn.addEventListener('click', () => startDuel());
     pauseDuelBtn.addEventListener('click', () => pauseDuel());
@@ -242,6 +293,11 @@ async function startNewPuzzle() {
     state.lastPlacedCell = null;
     updateTimerDisplay(0);
     statusFaceBtn.textContent = '🧠';
+
+    // Reset Rule Ledger
+    state.ruleHistory = [];
+    state.ruleCounts = { naked: 0, hidden: 0, mrv: 0, total: 0 };
+    renderRuleLedger();
 
     const diff = difficultySelect.value;
     try {
@@ -401,6 +457,17 @@ async function executeAIStep() {
 
         lastLatencyText.textContent = `${act.metadata.latency_ms} ms`;
         explanationText.textContent = act.explanation;
+
+        // Record into Rule Ledger
+        addRuleLedgerEntry({
+            row: act.row,
+            col: act.col,
+            value: act.value,
+            explanation: act.explanation,
+            is_deterministic: act.is_deterministic,
+            latency_ms: act.metadata.latency_ms,
+            mode: act.metadata.mode || 'EXACTOR'
+        });
 
         if (agent === 'exactor') {
             apiSavedText.textContent = `${81 - state.grid.empty_cells} calls saved`;
@@ -733,3 +800,139 @@ function exportMarkdownReport() {
     a.download = `exactor_sudoku_benchmark_${r.difficulty}.md`;
     a.click();
 }
+
+/* ==========================================================================
+   SYMBOLIC RULE LEDGER & DECISION INSPECTOR
+   ========================================================================== */
+function addRuleLedgerEntry(item) {
+    state.ruleHistory.push(item);
+
+    // Update counters
+    const expl = item.explanation.toLowerCase();
+    if (expl.includes('naked single')) {
+        state.ruleCounts.naked++;
+    } else if (expl.includes('hidden single')) {
+        state.ruleCounts.hidden++;
+    } else if (expl.includes('mrv') || expl.includes('branch')) {
+        state.ruleCounts.mrv++;
+    }
+    state.ruleCounts.total++;
+
+    renderRuleLedger();
+}
+
+function renderRuleLedger() {
+    if (countNakedSingles) countNakedSingles.textContent = state.ruleCounts.naked;
+    if (countHiddenSingles) countHiddenSingles.textContent = state.ruleCounts.hidden;
+    if (countMrvBranches) countMrvBranches.textContent = state.ruleCounts.mrv;
+    if (countTotalRules) countTotalRules.textContent = state.ruleCounts.total;
+
+    if (!ruleLedgerList) return;
+
+    if (state.ruleHistory.length === 0) {
+        ruleLedgerList.innerHTML = `<div class="ledger-empty-state">No se han ejecutado deducciones aún. Presiona "⚡ AI Deduction Step" o "▶ Auto Solve".</div>`;
+        return;
+    }
+
+    ruleLedgerList.innerHTML = '';
+    // Show in reverse chronological order (latest deduction first)
+    [...state.ruleHistory].reverse().forEach((item, idx) => {
+        const stepNum = state.ruleHistory.length - idx;
+        const div = document.createElement('div');
+        div.className = 'rule-ledger-item';
+
+        const expl = item.explanation;
+        let badgeClass = 'badge-cyan';
+        let ruleTag = 'Naked Single';
+        if (expl.includes('Hidden Single')) {
+            badgeClass = 'badge-purple';
+            ruleTag = 'Hidden Single';
+        } else if (expl.includes('MRV') || expl.includes('Branch') || expl.includes('SAT')) {
+            badgeClass = 'badge-green';
+            ruleTag = 'MRV SAT';
+        } else if (expl.includes('DFS')) {
+            badgeClass = 'badge-secondary';
+            ruleTag = 'DFS Search';
+        } else if (expl.includes('JEV') || expl.includes('LLM')) {
+            badgeClass = 'badge-purple';
+            ruleTag = 'JEV LLM';
+        }
+
+        div.innerHTML = `
+            <div class="rule-item-left">
+                <span class="rule-step-num">#${stepNum}</span>
+                <span class="rule-coord-badge">(${item.row + 1}, ${item.col + 1})</span>
+                <span class="rule-value-placed">${item.value}</span>
+                <span class="badge ${badgeClass}">${ruleTag}</span>
+            </div>
+            <div class="rule-item-text" title="${item.explanation}">${item.explanation}</div>
+            <div class="rule-item-actions">
+                <button class="btn btn-outline btn-sm inspect-btn" data-row="${item.row}" data-col="${item.col}">🔍 ¿Por qué?</button>
+            </div>
+        `;
+
+        div.querySelector('.inspect-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDecisionInspector(item.row, item.col);
+        });
+
+        div.addEventListener('click', () => {
+            state.selectedCell = { r: item.row, c: item.col };
+            renderGrid(state.grid, gridEl, handleCellClick);
+        });
+
+        ruleLedgerList.appendChild(div);
+    });
+}
+
+async function openDecisionInspector(r, c) {
+    if (r < 0 || r > 8 || c < 0 || c > 8) return;
+
+    try {
+        const res = await fetch('/api/sudoku/explain-cell', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: state.sessionId, row: r, col: c })
+        });
+        const data = await res.json();
+        if (data.status !== 'OK') return;
+
+        modalCellTitle.textContent = `Inspección de Decisión: Celda (${data.row}, ${data.col})`;
+        modalRuleBadge.textContent = data.rule_name;
+        modalPlacedValue.textContent = data.current_value !== 0 ? data.current_value : '·';
+
+        if (data.is_fixed) {
+            modalDecisionHeading.textContent = 'Pista Fija Inmutable';
+            modalDecisionSummary.textContent = 'Dada como condición inicial del rompecabezas.';
+        } else if (data.current_value !== 0) {
+            modalDecisionHeading.textContent = `Valor forzado: ${data.current_value}`;
+            modalDecisionSummary.textContent = data.causal_text;
+        } else {
+            modalDecisionHeading.textContent = `Celda vacía (${data.valid_candidates.length} candidatos disponibles)`;
+            modalDecisionSummary.textContent = 'Pendiente de reducción booleana determinista.';
+        }
+
+        modalRowIdx.textContent = data.row;
+        modalColIdx.textContent = data.col;
+        modalBoxIdx.textContent = `(${Math.floor((data.row - 1)/3) + 1}, ${Math.floor((data.col - 1)/3) + 1})`;
+
+        modalRowDigits.textContent = data.row_digits.length > 0 ? `[${data.row_digits.join(', ')}]` : '[Vacía]';
+        modalColDigits.textContent = data.col_digits.length > 0 ? `[${data.col_digits.join(', ')}]` : '[Vacía]';
+        modalBoxDigits.textContent = data.box_digits.length > 0 ? `[${data.box_digits.join(', ')}]` : '[Vacía]';
+
+        modalEliminatedDigits.innerHTML = data.eliminated_digits.length > 0
+            ? data.eliminated_digits.map(d => `<span class="digit-tag eliminated">${d}</span>`).join('')
+            : '<span class="text-muted">Ninguno</span>';
+
+        modalValidDigits.innerHTML = data.valid_candidates.length > 0
+            ? data.valid_candidates.map(d => `<span class="digit-tag winner">${d}</span>`).join('')
+            : '<span class="text-muted">0 candidatos (conflicto)</span>';
+
+        modalCausalText.textContent = data.causal_text;
+
+        decisionModal.classList.remove('hidden');
+    } catch (err) {
+        console.error('Error opening decision inspector:', err);
+    }
+}
+
