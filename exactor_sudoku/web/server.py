@@ -210,6 +210,9 @@ async def duel_step(req: DuelStepRequest):
                 "latency_ms": round(lat_jv, 4),
             }
 
+    ex_done = g_ex.is_complete() or g_ex.count_empty_cells() == 0 or (res_exactor is None)
+    jv_done = g_jv.is_complete() or g_jv.count_empty_cells() == 0 or (res_jev is None)
+
     return {
         "exactor": {
             "grid": g_ex.to_dict(),
@@ -221,7 +224,7 @@ async def duel_step(req: DuelStepRequest):
             "step": res_jev,
             "stats": stats["jev"],
         },
-        "is_duel_finished": g_ex.is_complete() and g_jv.is_complete(),
+        "is_duel_finished": ex_done and jv_done,
     }
 
 

@@ -364,8 +364,17 @@ async function executeAIStep() {
             body: JSON.stringify({ session_id: state.sessionId, agent_type: agent })
         });
         const data = await res.json();
-        if (data.status === 'COMPLETE' || data.status === 'NO_ACTION') {
+        if (data.status === 'COMPLETE') {
             stopAutoPlay();
+            handleVictory();
+            explanationText.textContent = `🎉 Sudoku solved successfully with 0 violations!`;
+            return;
+        }
+        if (data.status === 'NO_ACTION' || data.status === 'FINISHED_WITH_VIOLATIONS') {
+            stopAutoPlay();
+            explanationText.textContent = (state.grid.empty_cells === 0)
+                ? `🛑 Board filled but contains ${state.grid.violations} duplicate violations / conflicts.`
+                : `🛑 Agent stopped: No valid moves available from current board state.`;
             return;
         }
 
@@ -541,8 +550,24 @@ async function runDuelLoop() {
             exactorSpeedup.textContent = `${speedup.toLocaleString()}x faster`;
         }
 
-        if (data.exactor.stats.complete) exactorDuelStatus.textContent = '🏆 SOLVED';
-        if (data.jev.stats.complete) jevDuelStatus.textContent = '🏆 SOLVED';
+        if (data.exactor.stats.complete) {
+            exactorDuelStatus.textContent = '🏆 SOLVED (100% Valid)';
+            exactorDuelStatus.className = 'badge bg-success';
+        } else if (data.exactor.grid.empty_cells === 0) {
+            exactorDuelStatus.textContent = '⚠️ FILLED (With Violations)';
+            exactorDuelStatus.className = 'badge bg-warning';
+        }
+
+        if (data.jev.stats.complete) {
+            jevDuelStatus.textContent = '🏆 SOLVED (100% Valid)';
+            jevDuelStatus.className = 'badge bg-success';
+        } else if (data.jev.grid.empty_cells === 0 && data.jev.stats.violations > 0) {
+            jevDuelStatus.textContent = `❌ FAILED (${data.jev.stats.violations} Violations)`;
+            jevDuelStatus.className = 'badge bg-danger';
+        } else if (data.is_duel_finished && !data.jev.stats.complete) {
+            jevDuelStatus.textContent = '🛑 STUCK (No Valid Moves)';
+            jevDuelStatus.className = 'badge bg-danger';
+        }
 
         if (data.is_duel_finished) {
             pauseDuel();
