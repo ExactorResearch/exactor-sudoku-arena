@@ -66,6 +66,25 @@ class BenchmarkRequest(BaseModel):
     difficulty: str = "medium"
 
 
+class ContactLeadRequest(BaseModel):
+    name: str
+    email: str
+    company_role: str
+    use_case: str
+
+
+@app.post("/api/contact")
+def submit_contact_lead(lead: ContactLeadRequest):
+    """Registers inbound enterprise demo / lead inquiries."""
+    print(f"[LEAD CAPTURED] Name: {lead.name} | Email: {lead.email} | Role: {lead.company_role} | Volume/Use Case: {lead.use_case}")
+    return {
+        "status": "success",
+        "message": "Demo inquiry registered. The Exactor team will reach out at contact@exactor.tech.",
+        "recipient": "contact@exactor.tech",
+        "lead": lead.dict()
+    }
+
+
 @app.get("/")
 async def get_index():
     index_path = os.path.join(STATIC_DIR, "index.html")
