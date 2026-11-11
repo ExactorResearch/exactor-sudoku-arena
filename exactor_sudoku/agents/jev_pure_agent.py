@@ -11,9 +11,14 @@ from typing import Optional, Dict, Any
 from exactor_sudoku.agents.base import BaseSudokuAgent, SudokuAgentAction
 from exactor_sudoku.core.grid import SudokuGrid
 
-# Optional Jev SDK integration
+# Optional Jev SDK integration: prefer a sibling exactor-jev checkout, then the
+# vendored jev_sdk.py at the repository root.
 try:
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "exactor-jev")))
+    _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    _sibling_sdk = os.path.abspath(os.path.join(_repo_root, "..", "exactor-jev"))
+    for _p in (_sibling_sdk, _repo_root):
+        if os.path.isdir(_p) and _p not in sys.path:
+            sys.path.insert(0, _p)
     from jev_sdk import Jev
     JEV_SDK_AVAILABLE = True
 except Exception:
@@ -63,22 +68,61 @@ class JevPureSudokuAgent(BaseSudokuAgent):
         }
 
         executed_live = False
-        if self.client and os.environ.get("TYPESAFE_API_KEY"):
+        live_choice = None
+        live_confidence = 0.0
+        has_key = bool(os.environ.get("JEV_API_KEY") or os.environ.get("TYPESAFE_API_KEY"))
+        if self.client and has_key:
             try:
-                # Live JEV invocation
-                cand_items = list(all_cands.items())[:4]
-                choices = [f"SET_{r}_{c}_{list(cands)[0]}" for (r, c), cands in cand_items if cands]
+                # Offer real (cell, digit) options: the 4 most constrained cells,
+                # up to 2 candidate digits each.
+                cand_items = sorted(all_cands.items(), key=lambda kv: len(kv[1]))[:4]
+                choices = []
+                for (r, c), cands in cand_items:
+                    for d in sorted(cands)[:2]:
+                        choices.append(f"SET_{r}_{c}_{d}")
                 if choices:
                     res = self.client.choose(
                         state=state_repr,
                         instruction="Select the next mathematically valid Sudoku cell coordinate and digit.",
                         choices=choices
                     )
-                    executed_live = True
+                    live_choice = res.get("choice") or res.get("action")
+                    live_confidence = float(res.get("confidence") or 0.0)
+                    executed_live = bool(live_choice)
             except Exception:
                 executed_live = False
 
-        simulated_lat = 0.0 if executed_live else round(random.uniform(320.0, 580.0), 2)
+        if executed_live:
+            # Parse "SET_r_c_d" and apply Jev's actual decision.
+            parts = str(live_choice).split("_")
+            try:
+                r_j, c_j, d_j = int(parts[1]), int(parts[2]), int(parts[3])
+                if (r_j, c_j) in all_cands:
+                    lat_ms = (time.perf_counter() - t0) * 1000.0
+                    self.total_latency_ms += lat_ms
+                    valid_digit = d_j in all_cands[(r_j, c_j)]
+                    if not valid_digit:
+                        self.duplicate_violations += 1
+                    return SudokuAgentAction(
+                        row=r_j,
+                        col=c_j,
+                        value=d_j,
+                        confidence=live_confidence or 0.5,
+                        is_deterministic=valid_digit and len(all_cands[(r_j, c_j)]) == 1,
+                        explanation=f"[Jev Live API] Oracle selected digit {d_j} at ({r_j}, {c_j}){' [invalid candidate — constraint drift]' if not valid_digit else ''}.",
+                        metadata={
+                            "latency_ms": round(lat_ms, 2),
+                            "mode": "JEV_LIVE_API",
+                            "simulated_llm": False,
+                            "jev_choice": live_choice,
+                            "is_hallucination": not valid_digit,
+                        },
+                    )
+            except Exception:
+                pass
+            executed_live = False
+
+        simulated_lat = round(random.uniform(320.0, 580.0), 2)
 
         # Evaluate move with LLM heuristics + probabilistic counting noise
         is_hallucinating = (random.random() < self.hallucination_rate)
