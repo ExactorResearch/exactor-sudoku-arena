@@ -178,6 +178,16 @@ Explore how Exactor Accelerator solves combinatorial, rule-heavy, or constraint-
 
 ---
 
+## 🔗 Related Projects
+
+Part of the **Exactor** ecosystem of deterministic neuro-symbolic decision engines:
+
+- **[exactor-accelerator](https://github.com/ExactorResearch/exactor-accelerator)** — the Python library this demo is built on (`pip install exactor-accelerator`)
+- **[exactor-minesweeper](https://github.com/ExactorResearch/exactor-minesweeper)** — sibling constraint demo (live: [minesweeper.exactor.ai](https://minesweeper.exactor.ai))
+- **[SATGuardian](https://exactorresearch.github.io/satguardian/)** — production Rust WAF using the same Boolean-cube decision approach
+
+---
+
 ## License
 
 Dual-licensed under [MIT](LICENSE).
