@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-11T20:41:27.129550",
+  "timestamp": "2026-11-11T22:59:03.158054",
   "difficulty": "medium",
   "num_puzzles": 15,
   "metrics": {
@@ -11,15 +11,15 @@
       "avg_moves_per_puzzle": 55.0,
       "total_duplicate_violations": 0,
       "avg_violations_per_puzzle": 0.0,
-      "avg_latency_per_move_ms": 2.0858,
-      "p50_latency_ms": 1.392,
-      "p95_latency_ms": 5.5151,
-      "p99_latency_ms": 5.8051,
-      "total_time_seconds": 1.821,
+      "avg_latency_per_move_ms": 1.4024,
+      "p50_latency_ms": 0.7851,
+      "p95_latency_ms": 3.388,
+      "p99_latency_ms": 3.4299,
+      "total_time_seconds": 1.228,
       "total_api_calls": 0,
       "avg_api_calls_per_puzzle": 0.0,
       "deterministic_accuracy_pct": 100.0,
-      "speedup_vs_baseline": 310.4
+      "speedup_vs_baseline": 300.6
     },
     "Pure JEV (LLM / RLCD Inference)": {
       "agent_name": "Pure JEV (LLM / RLCD Inference)",
@@ -27,13 +27,13 @@
       "solved_count": 0,
       "solve_rate_pct": 0.0,
       "avg_moves_per_puzzle": 55.0,
-      "total_duplicate_violations": 352,
-      "avg_violations_per_puzzle": 23.47,
-      "avg_latency_per_move_ms": 647.3913,
-      "p50_latency_ms": 659.8335,
-      "p95_latency_ms": 1109.5724,
-      "p99_latency_ms": 1179.2782,
-      "total_time_seconds": 529.114,
+      "total_duplicate_violations": 323,
+      "avg_violations_per_puzzle": 21.53,
+      "avg_latency_per_move_ms": 421.5063,
+      "p50_latency_ms": 370.559,
+      "p95_latency_ms": 632.0656,
+      "p99_latency_ms": 690.0591,
+      "total_time_seconds": 345.238,
       "total_api_calls": 825,
       "avg_api_calls_per_puzzle": 55.0,
       "deterministic_accuracy_pct": 88.0,
@@ -47,21 +47,21 @@
       "avg_moves_per_puzzle": 55.0,
       "total_duplicate_violations": 0,
       "avg_violations_per_puzzle": 0.0,
-      "avg_latency_per_move_ms": 23.2231,
-      "p50_latency_ms": 8.4411,
-      "p95_latency_ms": 77.219,
-      "p99_latency_ms": 106.0905,
-      "total_time_seconds": 20.567,
+      "avg_latency_per_move_ms": 11.71,
+      "p50_latency_ms": 5.2886,
+      "p95_latency_ms": 29.973,
+      "p99_latency_ms": 30.003,
+      "total_time_seconds": 10.332,
       "total_api_calls": 0,
       "avg_api_calls_per_puzzle": 0.0,
       "deterministic_accuracy_pct": 75.0,
-      "speedup_vs_baseline": 27.9
+      "speedup_vs_baseline": 36.0
     }
   },
   "summary": {
-    "total_benchmark_time_seconds": 551.75,
+    "total_benchmark_time_seconds": 356.92,
     "fastest_agent": "Exactor-Accelerator (Neuro-Symbolic SAT)",
     "highest_solve_rate_agent": "Exactor-Accelerator (Neuro-Symbolic SAT)",
-    "speedup_factor": 310.4
+    "speedup_factor": 300.6
   }
 }
